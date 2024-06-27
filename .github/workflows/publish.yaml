@@ -1,0 +1,45 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+
+jobs:
+  upload:
+    name: Upload repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: repo
+          path: .
+
+  deploy-cloud-dev:
+    name: Deploy to cloud platform (dev)
+    uses: A2-ai/ci-cd-workflows/.github/workflows/sync-to-s3.yaml@main
+    needs: upload
+    permissions:
+      id-token: write
+    with:
+      artifact: repo
+      s3-bucket: a2ai-cloud-build-artifacts-dev-654225707598-us-east-2
+      s3-prefix: project-templates/R-project-starter
+
+  deploy-cloud-prod:
+    name: Deploy to cloud platform (prod)
+    uses: A2-ai/ci-cd-workflows/.github/workflows/sync-to-s3.yaml@main
+    needs: upload
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      id-token: write
+    with:
+      artifact: repo
+      s3-bucket: a2ai-cloud-build-artifacts-prod-722818558481-us-east-2
+      s3-prefix: project-templates/R-project-starter

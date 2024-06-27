@@ -1,0 +1,13 @@
+ignore = [".git", "README.md"]
+
+[[slots]]
+key = "project_name"
+type = "String"
+name = "Project name"
+description = "Project name"
+
+[[slots]]
+key = "enable_renv"
+type = "Boolean"
+name = "Enable renv"
+description = "Enable renv"
